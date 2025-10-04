@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Welcoming Blog | Latest Stories</title>
+    <title>Virtual Security Labs Blog | Latest Stories</title>
     <!-- Basic SEO Meta Tags (Update these for your site!) -->
-    <meta name="description" content="Sharing thoughts, insights, and stories on tech, life, and everything in between. Fast, simple, and secure.">
+    <meta name="description" content="Welcome to the Virtual Security Labs Blog! Here, I share thoughts and insights on the ever-evolving world of technology, security, networking, servers, and cloud infrastructures.">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
@@ -46,7 +46,7 @@
     <header class="bg-emerald-500 shadow-xl">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex justify-between items-center">
             <a href="index.html" class="text-3xl font-extrabold text-white tracking-wider">
-                Hello, World!
+                Virtual Security Labs Blog
             </a>
             <nav class="space-x-6">
                 <a href="#posts" class="text-white hover:text-emerald-100 transition duration-150 ease-in-out font-medium text-lg">Blog</a>
@@ -64,6 +64,22 @@
                 Welcome to my blog! Here, I share my thoughts, insights, and information on the ever-evolving world of technology. Whether you're a tech enthusiast or a seasoned professional, you'll find valuable resources and how-to guides covering key topics like security, networking, servers, and cloud infrastructures. Join me as we explore the latest trends, tips, and best practices to enhance your understanding and navigate the tech landscape! 
             </p>
         </div>
+
+        <!-- SEARCH INPUT BAR (New Feature) -->
+        <div class="mb-10">
+            <div class="relative">
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="Search posts by title or summary..." 
+                    class="w-full p-4 pl-12 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 transition-colors duration-200 shadow-md text-lg"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.3-4.3"></path>
+                </svg>
+            </div>
+        </div>
         
         <h2 class="text-3xl font-bold text-gray-800 mb-8 border-b-4 border-emerald-400 pb-3 inline-block">Latest Stories</h2>
         
@@ -77,7 +93,7 @@
     <footer class="bg-gray-100 mt-16">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
             <p class="text-gray-500 text-sm">
-                &copy; <span id="current-year"></span> Virutal Security Blog. All rights reserved.
+                &copy; <span id="current-year"></span> Virtual Security Blog. All rights reserved.
             </p>
         </div>
     </footer>
@@ -90,7 +106,7 @@
 
             // --- BLOG POST DATA ARRAY ---
             // To add a new post: Add a new object to this array and create a matching HTML file!
-            const posts = [
+            const allPosts = [ // Renamed to allPosts for clarity in search function
                 {
                     title: "The Magic of Static Site Generation",
                     summary: "Discover why SSG is booming for blogs. It offers superior performance, security, and a simple deployment process perfect for GitHub Pages.",
@@ -115,15 +131,24 @@
             ];
 
             const container = document.getElementById('posts-container');
+            const searchInput = document.getElementById('search-input');
             const loadingMessage = document.getElementById('loading-message');
 
-            // Function to render posts
-            function renderPosts() {
+            // Function to render posts, now accepting an array to render
+            function renderPosts(postsToRender) {
+                // Clear existing posts
+                container.innerHTML = ''; 
+
                 if (loadingMessage) {
-                    loadingMessage.remove();
+                    loadingMessage.remove(); // Remove loading message once we have data
                 }
 
-                posts.forEach(post => {
+                if (postsToRender.length === 0) {
+                    container.innerHTML = '<p class="text-center text-xl text-gray-500 py-10 md:col-span-3">No results found. Try a different search term!</p>';
+                    return;
+                }
+
+                postsToRender.forEach(post => {
                     const postHTML = `
                         <article class="post-card bg-white p-6 rounded-3xl shadow-lg border border-gray-100 flex flex-col justify-between">
                             <div class="flex-grow">
@@ -156,13 +181,33 @@
                     `;
                     container.insertAdjacentHTML('beforeend', postHTML);
                 });
-
-                if (posts.length === 0) {
-                    container.innerHTML = '<p class="text-center text-xl text-gray-500 py-10 md:col-span-3">No posts found yet! Time to start writing.</p>';
-                }
             }
 
-            renderPosts();
+            // --- SEARCH LOGIC ---
+            function handleSearch() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                
+                if (searchTerm === '') {
+                    // If the search box is empty, show all posts
+                    renderPosts(allPosts);
+                    return;
+                }
+
+                // Filter the posts based on title and summary
+                const filteredPosts = allPosts.filter(post => {
+                    const titleMatch = post.title.toLowerCase().includes(searchTerm);
+                    const summaryMatch = post.summary.toLowerCase().includes(searchTerm);
+                    return titleMatch || summaryMatch;
+                });
+
+                renderPosts(filteredPosts);
+            }
+
+            // Initial load of all posts
+            renderPosts(allPosts);
+
+            // Add event listener for real-time filtering as the user types
+            searchInput.addEventListener('input', handleSearch);
         });
     </script>
 </body>
